@@ -10,6 +10,7 @@ import com.teamnative.nativestudy.global.logging.LogLevel
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -18,6 +19,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler(
     private val appLogger: AppLogger,
 ) {
+
+    @ExceptionHandler(InvalidRequestException::class)
+    fun handleInvalidRequestException(
+        exception: InvalidRequestException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> = handleClientException(
+        exception,
+        HttpStatus.BAD_REQUEST,
+        "INVALID_REQUEST",
+        request,
+    )
+
+    @ExceptionHandler(ConflictException::class)
+    fun handleConflictException(
+        exception: ConflictException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> = handleClientException(
+        exception,
+        HttpStatus.CONFLICT,
+        "CONFLICT",
+        request,
+    )
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
@@ -34,6 +57,19 @@ class GlobalExceptionHandler(
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse(code = "VALIDATION_ERROR", message = message))
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleUnreadableRequest(
+        exception: HttpMessageNotReadableException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> {
+        val status = HttpStatus.BAD_REQUEST
+        val message = "요청 본문이 올바른 JSON 형식이 아닙니다."
+        logException(exception, status, message, request)
+        return ResponseEntity
+            .status(status)
+            .body(ErrorResponse(code = "INVALID_REQUEST", message = message))
     }
 
     @ExceptionHandler(Exception::class)
@@ -80,5 +116,16 @@ class GlobalExceptionHandler(
         } else {
             appLogger.warn(log)
         }
+    }
+
+    private fun handleClientException(
+        exception: RuntimeException,
+        status: HttpStatus,
+        code: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> {
+        val message = exception.message ?: "Invalid request."
+        logException(exception, status, message, request)
+        return ResponseEntity.status(status).body(ErrorResponse(code = code, message = message))
     }
 }

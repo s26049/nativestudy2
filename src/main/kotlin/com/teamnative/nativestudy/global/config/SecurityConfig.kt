@@ -27,6 +27,8 @@ class SecurityConfig {
                         "/",
                         "/health",
                         "/actuator/health",
+                        "/auth/signup",
+                        "/auth/login",
                         "/api/v1/auth/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
