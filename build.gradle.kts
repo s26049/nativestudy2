@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring") version "2.4.10"
 }
 
-group = "com.teamnative.backend"
+group = "com.teamnative.nativestudy"
 version = "0.0.1-SNAPSHOT"
 
 java {
