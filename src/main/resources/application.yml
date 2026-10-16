@@ -1,6 +1,13 @@
 spring:
   application:
     name: backend-v1
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/nativestudy?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 server:
   port: 8080
