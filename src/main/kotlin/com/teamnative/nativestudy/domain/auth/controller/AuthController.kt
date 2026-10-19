@@ -28,9 +28,5 @@ class AuthController(
     @Operation(summary = "로그인", description = "아이디/비밀번호로 로그인하여 액세스 토큰을 발급받습니다.")
     @PostMapping("/login")
     fun login(@Valid @RequestBody request: LoginRequest): LoginResponse =
-        LoginResponse(
-            accessToken = "replace-with-jwt-token",
-            tokenType = "Bearer",
-            username = request.username,
-        )
+        authService.login(request)
 }
