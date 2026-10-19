@@ -10,10 +10,13 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    private val bearerTokenAuthenticationFilter: BearerTokenAuthenticationFilter,
+) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
@@ -29,6 +32,7 @@ class SecurityConfig {
                         "/actuator/health",
                         "/auth/signup",
                         "/auth/login",
+                        "/auth/logout",
                         "/api/v1/auth/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
@@ -37,7 +41,7 @@ class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/v1/public/**").permitAll()
                     .anyRequest().authenticated()
             }
-            .httpBasic(Customizer.withDefaults())
+            .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 
     @Bean
