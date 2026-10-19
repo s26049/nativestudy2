@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${MYSQL_URL:jdbc:mysql://localhost:3306/nativestudy?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul}
     username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:12qwaszx0120*}
+    password: ${MYSQL_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: update
