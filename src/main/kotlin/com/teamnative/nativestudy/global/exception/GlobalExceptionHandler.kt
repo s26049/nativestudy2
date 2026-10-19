@@ -42,6 +42,17 @@ class GlobalExceptionHandler(
         request,
     )
 
+    @ExceptionHandler(UnauthorizedException::class)
+    fun handleUnauthorizedException(
+        exception: UnauthorizedException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ErrorResponse> = handleClientException(
+        exception,
+        HttpStatus.UNAUTHORIZED,
+        "UNAUTHORIZED",
+        request,
+    )
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
         exception: MethodArgumentNotValidException,

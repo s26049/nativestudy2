@@ -2,10 +2,13 @@ package com.teamnative.nativestudy.domain.auth.service
 
 import com.teamnative.nativestudy.domain.auth.dto.SignupRequest
 import com.teamnative.nativestudy.domain.auth.dto.SignupResponse
+import com.teamnative.nativestudy.domain.auth.dto.LoginRequest
+import com.teamnative.nativestudy.domain.auth.dto.LoginResponse
 import com.teamnative.nativestudy.domain.auth.entity.User
 import com.teamnative.nativestudy.domain.auth.repository.UserRepository
 import com.teamnative.nativestudy.global.exception.ConflictException
 import com.teamnative.nativestudy.global.exception.InvalidRequestException
+import com.teamnative.nativestudy.global.exception.UnauthorizedException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -15,7 +18,22 @@ import org.springframework.transaction.annotation.Transactional
 class AuthService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val accessTokenService: AccessTokenService,
 ) {
+    @Transactional(readOnly = true)
+    fun login(request: LoginRequest): LoginResponse {
+        val user = userRepository.findByUsername(request.username)
+        if (user == null || !passwordEncoder.matches(request.password, user.password)) {
+            throw UnauthorizedException("Invalid username or password.")
+        }
+
+        return LoginResponse(
+            accessToken = accessTokenService.issue(user.username),
+            tokenType = "Bearer",
+            username = user.username,
+        )
+    }
+
     @Transactional
     fun signup(request: SignupRequest): SignupResponse {
         if (request.password != request.confirmPassword) {
