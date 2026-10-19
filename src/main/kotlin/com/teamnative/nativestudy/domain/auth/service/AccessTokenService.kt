@@ -10,9 +10,9 @@ import javax.crypto.spec.SecretKeySpec
 
 @Service
 class AccessTokenService(
-    private val objectMapper: ObjectMapper,
     @Value("\${JWT_SECRET:local-development-secret-change-before-deploy-2026}") private val secret: String,
 ) {
+    private val objectMapper = ObjectMapper()
     private val revokedTokens = ConcurrentHashMap<String, Long>()
 
     fun issue(username: String): String {
@@ -36,7 +36,7 @@ class AccessTokenService(
 
     fun username(token: String): String? {
         val parts = token.split('.')
-        if (parts.size != 3 || token in revokedTokens) return null
+        if (parts.size != 3 || revokedTokens.containsKey(token)) return null
         val content = "${parts[0]}.${parts[1]}"
         val mac = Mac.getInstance("HmacSHA256")
         mac.init(SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "HmacSHA256"))
