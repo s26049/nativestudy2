@@ -9,9 +9,9 @@ import javax.crypto.spec.SecretKeySpec
 
 @Service
 class AccessTokenService(
-    private val objectMapper: ObjectMapper,
     @Value("\${JWT_SECRET:local-development-secret-change-before-deploy-2026}") private val secret: String,
 ) {
+    private val objectMapper = ObjectMapper()
     fun issue(username: String): String {
         val encoder = Base64.getUrlEncoder().withoutPadding()
         val header = encoder.encodeToString(objectMapper.writeValueAsBytes(mapOf("alg" to "HS256", "typ" to "JWT")))
