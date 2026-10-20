@@ -39,6 +39,14 @@ class AuthService(
     }
 
     @Transactional
+    fun deleteAccount(username: String, token: String?) {
+        val user = userRepository.findByUsername(username)
+            ?: throw UnauthorizedException("Authenticated account was not found.")
+        userRepository.delete(user)
+        token?.let(accessTokenService::revoke)
+    }
+
+    @Transactional
     fun signup(request: SignupRequest): SignupResponse {
         if (request.password != request.confirmPassword) {
             throw InvalidRequestException("비밀번호와 비밀번호 확인이 일치하지 않습니다.")
