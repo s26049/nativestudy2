@@ -34,6 +34,10 @@ class AuthService(
         )
     }
 
+    fun logout(token: String) {
+        accessTokenService.revoke(token)
+    }
+
     @Transactional
     fun signup(request: SignupRequest): SignupResponse {
         if (request.password != request.confirmPassword) {
