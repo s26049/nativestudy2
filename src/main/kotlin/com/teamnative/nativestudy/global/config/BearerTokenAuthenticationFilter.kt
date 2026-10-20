@@ -1,6 +1,7 @@
 package com.teamnative.nativestudy.global.config
 
 import com.teamnative.nativestudy.domain.auth.service.AccessTokenService
+import com.teamnative.nativestudy.domain.auth.repository.UserRepository
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class BearerTokenAuthenticationFilter(
     private val accessTokenService: AccessTokenService,
+    private val userRepository: UserRepository,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -22,7 +24,7 @@ class BearerTokenAuthenticationFilter(
         val authorization = request.getHeader("Authorization")
         if (authorization?.startsWith("Bearer ", ignoreCase = true) == true) {
             val username = accessTokenService.username(authorization.substringAfter(' '))
-            if (username != null) {
+            if (username != null && userRepository.existsByUsername(username)) {
                 SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
                     username,
                     null,

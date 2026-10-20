@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.web.bind.annotation.DeleteMapping
 
 @Tag(name = "Auth", description = "인증 관련 API")
 @RestController
@@ -43,5 +45,17 @@ class AuthController(
             ?.takeIf { it.isNotBlank() }
             ?: throw UnauthorizedException("Bearer token is required.")
         authService.logout(token)
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "인증된 사용자의 계정을 삭제합니다.")
+    @DeleteMapping("/delete-account")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteAccount(request: HttpServletRequest) {
+        val username = request.userPrincipal?.name
+            ?: throw UnauthorizedException("Authentication is required.")
+        val token = request.getHeader("Authorization")
+            ?.takeIf { it.startsWith("Bearer ", ignoreCase = true) }
+            ?.substringAfter(' ')
+        authService.deleteAccount(username, token)
     }
 }
