@@ -9,15 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class SampleController {
 
-    @Operation(summary = "공개 핑", description = "인증 없이 호출 가능한 핑 API입니다.")
-    @GetMapping("/api/v1/public/ping")
-    fun publicPing(): Map<String, String> = mapOf("message" to "public pong")
-
-    @Operation(summary = "비공개 핑", description = "인증이 필요한 핑 API입니다.")
-    @GetMapping("/api/v1/private/ping")
-    fun privatePing(): Map<String, String> = mapOf("message" to "private pong")
-
-    @Operation(summary = "Authenticated message", description = "Returns Hello World to authenticated users.")
+    @Operation(summary = "Authenticated message", description = "/message path 에 접근했을 때 로그인이 되어 있다면 Hello World 출력, 이외엔 401 status code 반환")
     @GetMapping("/message")
     fun message(): String = "Hello World"
 }
